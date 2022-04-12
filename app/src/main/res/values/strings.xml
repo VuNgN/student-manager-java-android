@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">studentManager</string>
+    <string name="addBtn">add</string>
+    <string name="editBtn">edit</string>
+    <string name="deleteBtn">delete</string>
+    <string name="name">Name</string>
+    <string name="age">Age</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="add_a_student">Add a student</string>
+</resources>
