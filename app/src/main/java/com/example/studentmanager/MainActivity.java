@@ -1,16 +1,25 @@
 package com.example.studentmanager;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class MainActivity extends Activity {
     ArrayList<RecyclerItem> recyclerItems = new ArrayList<>();
@@ -44,11 +53,19 @@ public class MainActivity extends Activity {
         editBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Student checkedStudent = checkedStudents().get(0).getStudent();
+                Student checkedStudent = checkedRecyclerItems().get(0).getStudent();
                 Intent intent = new Intent(MainActivity.this, StudentHandleActivity.class);
-                intent.putExtra("Student", (Serializable) checkedStudent);
+                intent.putExtra("Student", checkedStudent);
                 intent.putExtra("Request", REQUEST_CODE_EDIT);
                 startActivityForResult(intent, REQUEST_CODE_EDIT);
+            }
+        });
+
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onClick(View view) {
+                showAlertDialog(MainActivity.this);
             }
         });
 
@@ -65,17 +82,23 @@ public class MainActivity extends Activity {
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
+    protected void onRestart() {
+        super.onRestart();
+        adapter.notifyDataSetChanged();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // Xử lý sự kiện thêm mới sinh viên
         if(requestCode == REQUEST_CODE_ADD && resultCode == RESULT_OK && data != null) {
             Student newStudent = (Student) data.getSerializableExtra("Student");
-            recyclerItems.add(new RecyclerItem(recyclerItems.size(), newStudent, false));
-            adapter.notifyDataSetChanged();
+            recyclerItems.add(new RecyclerItem(recyclerItems.size() + 1, newStudent, false));
         }
         // Xử lý sự kiện sửa sinh viên
         else if (requestCode == REQUEST_CODE_EDIT && resultCode == RESULT_OK && data != null) {
-            RecyclerItem checkedRecyclerItem = checkedStudents().get(0);
+            RecyclerItem checkedRecyclerItem = checkedRecyclerItems().get(0);
             Student editedStudent = (Student) data.getSerializableExtra("Student");
             for (int i = 0; i < recyclerItems.size(); i++){
                 RecyclerItem recyclerItem = recyclerItems.get(i);
@@ -85,14 +108,13 @@ public class MainActivity extends Activity {
                     recyclerItem.getStudent().setSex(editedStudent.getSex());
                 }
             }
-            adapter.notifyDataSetChanged();
         }
     }
 
     /**
      *  Trả về các phần tử của recycler đã được check
      */
-    private ArrayList<RecyclerItem> checkedStudents(){
+    private ArrayList<RecyclerItem> checkedRecyclerItems(){
         ArrayList<RecyclerItem> checkedRecyclerItems = new ArrayList<>();
         for (int i = 0; i < recyclerItems.size(); i++) {
             if (recyclerItems.get(i).getIsChecked()) {
@@ -101,4 +123,56 @@ public class MainActivity extends Activity {
         }
         return checkedRecyclerItems;
     }
+    /**
+     * Hàm xử lý xoá Students
+     * */
+    private void deleteStudents() {
+        int recyclerItemsSize = recyclerItems.size();
+        for (int i = checkedRecyclerItems().size(); i > 0; i--) {
+            for (int j = recyclerItemsSize; j > 0 ; j--) {
+                if(recyclerItems.get(j - 1).getId() == checkedRecyclerItems().get(i - 1).getId()) {
+                    recyclerItemsSize -= 1;
+                    recyclerItems.remove(j - 1);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void showAlertDialog(final Context context)  {
+        final Drawable positiveIcon = context.getResources().getDrawable(R.drawable.ic_baseline_check_circle_24);
+        final Drawable negativeIcon = context.getResources().getDrawable(R.drawable.ic_baseline_cancel_24);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        // Set Title and Message:
+        builder.setTitle("Hey dude!").setMessage("Do you want to delete?");
+
+
+        builder.setCancelable(true);
+        // builder.setIcon(R.drawable.icon_title);
+
+        // Create "Yes" button with OnClickListener.
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @SuppressLint("NotifyDataSetChanged")
+            public void onClick(DialogInterface dialog, int id) {
+                deleteStudents();
+                adapter.notifyDataSetChanged();
+                adapter.btnHandle();
+            }
+        });
+        builder.setPositiveButtonIcon(positiveIcon);
+
+        // Create "No" button with OnClickListener.
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+        builder.setNegativeButtonIcon(negativeIcon);
+
+        // Create AlertDialog:
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
 }
