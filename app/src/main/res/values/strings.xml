@@ -7,4 +7,6 @@
     <string name="age">Age</string>
     <string name="cancel_button">Cancel</string>
     <string name="add_a_student">Add a student</string>
+    <string name="sex">Sex</string>
+    <string name="edit_student">Edit student</string>
 </resources>

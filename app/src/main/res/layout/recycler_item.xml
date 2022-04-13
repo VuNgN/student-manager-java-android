@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:stretchColumns="1">
+    android:layout_margin="5dp"
+    android:stretchColumns="0">
     <TableRow tools:ignore="UselessParent"
         android:background="@drawable/border">
         <TextView
@@ -12,21 +13,23 @@
             android:layout_height="wrap_content"
             android:layout_span="2"
             android:layout_gravity="start|center"
-            android:paddingHorizontal="10dp"/>
+            android:padding="10dp"/>
         <TextView
             android:id="@+id/ageTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="10dp"/>
+            android:layout_gravity="center"
+            android:padding="10dp"/>
         <TextView
             android:id="@+id/sexTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="10dp"/>
+            android:padding="10dp"
+            android:layout_gravity="center"/>
         <CheckBox
             android:id="@+id/checkbox"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="10dp"/>
+            android:padding="10dp"/>
     </TableRow>
 </TableLayout>

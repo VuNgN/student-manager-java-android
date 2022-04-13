@@ -2,10 +2,16 @@ package com.example.studentmanager;
 
 import java.io.Serializable;
 
+/**
+ * Khai báo đối tượng Student
+ * name là tên của Student
+ * age là tuổi của Student
+ * sex là giới tính của Student
+ * */
 public class Student implements Serializable {
-    private final String name;
-    private final int age;
-    private final String sex;
+    private  String name;
+    private  int age;
+    private  String sex;
 
     public Student(String name, int age, String sex){
         this.name = name;
@@ -24,4 +30,10 @@ public class Student implements Serializable {
     String getSex () {
         return this.sex;
     }
+
+    void setName (String name) { this.name = name; }
+
+    void setAge (int age) { this.age = age; }
+
+    void setSex (String sex) {this.sex = sex;}
 }

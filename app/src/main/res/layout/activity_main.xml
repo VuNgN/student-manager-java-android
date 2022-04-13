@@ -18,28 +18,39 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/addBtn"
+        android:backgroundTint="@color/teal_700"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline2" />
+        app:layout_constraintTop_toTopOf="@+id/guideline2"
+        tools:ignore="UnusedAttribute" />
 
     <Button
         android:id="@+id/editBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/editBtn"
+        android:visibility="gone"
+        android:backgroundTint="@color/purple_500"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toStartOf="@+id/deleteBtn"
         app:layout_constraintHorizontal_bias="0.188"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addBtn" />
+        app:layout_constraintTop_toBottomOf="@+id/addBtn"
+        tools:ignore="UnusedAttribute" />
 
     <Button
         android:id="@+id/deleteBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/red"
+        android:textColor="@color/white"
         android:text="@string/deleteBtn"
-        app:layout_constraintStart_toEndOf="@id/editBtn"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addBtn" />
+        app:layout_constraintStart_toEndOf="@id/editBtn"
+        app:layout_constraintTop_toBottomOf="@+id/addBtn"
+        tools:ignore="UnusedAttribute" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline3"
@@ -54,14 +65,15 @@
         android:stretchColumns="1"
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_margin="5dp">
 
         <TableRow
             tools:ignore="UselessParent">
 
             <TextView
                 android:id="@+id/nameTextView"
-                android:text="Name"
+                android:text="@string/name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -70,21 +82,21 @@
 
             <TextView
                 android:id="@+id/ageTextView"
-                android:text="Age"
-                android:layout_width="wrap_content"
+                android:text="@string/age"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="10dp" />
 
             <TextView
                 android:id="@+id/sexTextView"
-                android:text="Sex"
-                android:layout_width="wrap_content"
+                android:text="@string/sex"
+                android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="10dp" />
 
             <CheckBox
                 android:id="@+id/checkbox"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="10dp" />
         </TableRow>

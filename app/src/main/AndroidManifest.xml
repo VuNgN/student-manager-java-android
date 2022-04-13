@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.StudentManager">
         <activity
-            android:name=".AddActivity"
+            android:name=".StudentHandleActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
