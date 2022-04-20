@@ -1,32 +1,30 @@
 package com.example.studentmanager;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import java.io.Serializable;
+
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class MainActivity extends Activity {
-    ArrayList<RecyclerItem> recyclerItems = new ArrayList<>();
+    ArrayList<Student> students = new ArrayList<>();
     int REQUEST_CODE_ADD = new Requests().REQUEST_CODE_ADD;
     int REQUEST_CODE_EDIT = new Requests().REQUEST_CODE_EDIT;
     CustomAdapter adapter;
     LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+    Common database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,13 +37,18 @@ public class MainActivity extends Activity {
         Button editBtn = this.findViewById(R.id.editBtn);
         Button deleteBtn = this.findViewById(R.id.deleteBtn);
 
-        adapter = new CustomAdapter(recyclerItems, this, editBtn, deleteBtn, checkBoxAll);
+        database = new Common(this, "StudentManager.db");
+        database.createTable();
+
+        adapter = new CustomAdapter(students, this, editBtn, deleteBtn, checkBoxAll);
 
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, StudentHandleActivity.class);
-                intent.putExtra("Request", REQUEST_CODE_ADD);
+                Bundle bundle = new Bundle();
+                bundle.putInt("Request", REQUEST_CODE_ADD);
+                intent.putExtra("data", bundle);
                 startActivityForResult(intent, REQUEST_CODE_ADD);
             }
         });
@@ -53,10 +56,12 @@ public class MainActivity extends Activity {
         editBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Student checkedStudent = checkedRecyclerItems().get(0).getStudent();
+                Student checkedStudent = checkedStudents().get(0);
                 Intent intent = new Intent(MainActivity.this, StudentHandleActivity.class);
-                intent.putExtra("Student", checkedStudent);
-                intent.putExtra("Request", REQUEST_CODE_EDIT);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("Student", checkedStudent);
+                bundle.putInt("Request", REQUEST_CODE_EDIT);
+                intent.putExtra("data", bundle);
                 startActivityForResult(intent, REQUEST_CODE_EDIT);
             }
         });
@@ -69,12 +74,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        recyclerItems.add(new RecyclerItem(0, new Student("Nguyễn Ngọc Vũ", 21, "Nam"), false));
-        recyclerItems.add(new RecyclerItem(1, new Student("Jack Ma", 57, "Nam"), false));
-        recyclerItems.add(new RecyclerItem(2, new Student("Mark Elliot Zuckerberg", 37, "Nam"), false));
-        recyclerItems.add(new RecyclerItem(3, new Student("Justin Bieber", 28, "Nam"), false));
-        recyclerItems.add(new RecyclerItem(4, new Student("Taylor Swift", 32, "Nữ"), false));
-        recyclerItems.add(new RecyclerItem(5, new Student("Elon Musk", 50, "Nam"), false));
+        getData();
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -92,54 +92,47 @@ public class MainActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // Xử lý sự kiện thêm mới sinh viên
-        if(requestCode == REQUEST_CODE_ADD && resultCode == RESULT_OK && data != null) {
+        if (requestCode == REQUEST_CODE_ADD && resultCode == RESULT_OK && data != null) {
             Student newStudent = (Student) data.getSerializableExtra("Student");
-            recyclerItems.add(new RecyclerItem(recyclerItems.size() + 1, newStudent, false));
+            database.insertData(newStudent.getName(), newStudent.getAge(), newStudent.getSex());
+            getData();
         }
         // Xử lý sự kiện sửa sinh viên
         else if (requestCode == REQUEST_CODE_EDIT && resultCode == RESULT_OK && data != null) {
-            RecyclerItem checkedRecyclerItem = checkedRecyclerItems().get(0);
             Student editedStudent = (Student) data.getSerializableExtra("Student");
-            for (int i = 0; i < recyclerItems.size(); i++){
-                RecyclerItem recyclerItem = recyclerItems.get(i);
-                if (recyclerItem.getId() == checkedRecyclerItem.getId()) {
-                    recyclerItem.getStudent().setName(editedStudent.getName());
-                    recyclerItem.getStudent().setAge(editedStudent.getAge());
-                    recyclerItem.getStudent().setSex(editedStudent.getSex());
-                }
-            }
+            database.updateData(editedStudent.getId(), editedStudent.getName(), editedStudent.getAge(), editedStudent.getSex());
+            getData();
         }
     }
 
     /**
-     *  Trả về các phần tử của recycler đã được check
+     * Trả về các phần tử của recycler đã được check
      */
-    private ArrayList<RecyclerItem> checkedRecyclerItems(){
-        ArrayList<RecyclerItem> checkedRecyclerItems = new ArrayList<>();
-        for (int i = 0; i < recyclerItems.size(); i++) {
-            if (recyclerItems.get(i).getIsChecked()) {
-                checkedRecyclerItems.add(recyclerItems.get(i));
+    private ArrayList<Student> checkedStudents() {
+        ArrayList<Student> checkedStudents = new ArrayList<>();
+        for (int i = 0; i < students.size(); i++) {
+            if (students.get(i).isChecked()) {
+                checkedStudents.add(students.get(i));
             }
         }
-        return checkedRecyclerItems;
-    }
-    /**
-     * Hàm xử lý xoá Students
-     * */
-    private void deleteStudents() {
-        int recyclerItemsSize = recyclerItems.size();
-        for (int i = checkedRecyclerItems().size(); i > 0; i--) {
-            for (int j = recyclerItemsSize; j > 0 ; j--) {
-                if(recyclerItems.get(j - 1).getId() == checkedRecyclerItems().get(i - 1).getId()) {
-                    recyclerItemsSize -= 1;
-                    recyclerItems.remove(j - 1);
-                    break;
-                }
-            }
-        }
+        return checkedStudents;
     }
 
-    public void showAlertDialog(final Context context)  {
+    @SuppressLint("NotifyDataSetChanged")
+    public void getData() {
+        Cursor studentsCursor = database.selectData();
+        students.clear();
+        while (studentsCursor.moveToNext()) {
+            Integer id = studentsCursor.getInt(0);
+            String name = studentsCursor.getString(1);
+            int age = studentsCursor.getInt(2);
+            String sex = studentsCursor.getString(3);
+            students.add(new Student(id, name, age, sex));
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    public void showAlertDialog(final Context context) {
         final Drawable positiveIcon = context.getResources().getDrawable(R.drawable.ic_baseline_check_circle_24);
         final Drawable negativeIcon = context.getResources().getDrawable(R.drawable.ic_baseline_cancel_24);
 
@@ -156,8 +149,8 @@ public class MainActivity extends Activity {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @SuppressLint("NotifyDataSetChanged")
             public void onClick(DialogInterface dialog, int id) {
-                deleteStudents();
-                adapter.notifyDataSetChanged();
+                database.deleteStudents(checkedStudents());
+                getData();
                 adapter.btnHandle();
             }
         });

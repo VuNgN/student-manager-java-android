@@ -1,6 +1,7 @@
 package com.example.studentmanager;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -26,7 +27,8 @@ public class StudentHandleActivity extends AppCompatActivity {
         int REQUEST_CODE_EDIT = new Requests().REQUEST_CODE_EDIT;
 
         Intent getIntent = getIntent();
-        int REQUEST = getIntent.getIntExtra("Request", 0);
+        Bundle bundle = getIntent.getBundleExtra("data");
+        int REQUEST = bundle.getInt("Request", 0);
 
         //create a list of items for the spinner.
         String[] items = new String[]{"Nam", "Nữ"};
@@ -49,7 +51,7 @@ public class StudentHandleActivity extends AppCompatActivity {
             handleBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    sendData(nameInput, ageInput, sexDropdown);
+                    sendData(null, nameInput, ageInput, sexDropdown);
                 }
             });
         }
@@ -57,14 +59,14 @@ public class StudentHandleActivity extends AppCompatActivity {
         else if (REQUEST == REQUEST_CODE_EDIT) {
             handleBtn.setText(R.string.editBtn);
             title.setText(R.string.edit_student);
-            Student student = (Student) getIntent.getSerializableExtra("Student");
+            Student student = (Student) bundle.getSerializable("Student");
             nameInput.setText(student.getName());
             ageInput.setText(String.valueOf(student.getAge()));
             sexDropdown.setSelection(adapter.getPosition(student.getSex()));
             handleBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    sendData(nameInput, ageInput, sexDropdown);
+                    sendData(student.getId(), nameInput, ageInput, sexDropdown);
                 }
             });
         }
@@ -72,14 +74,14 @@ public class StudentHandleActivity extends AppCompatActivity {
 
     /**
      * Hàm gửi dữ liệu ra activity khác
-     * */
-    private void sendData(EditText nameInput, EditText ageInput, Spinner sexDropdown) {
+     */
+    private void sendData(Integer id, EditText nameInput, EditText ageInput, Spinner sexDropdown) {
         String name = nameInput.getText().toString().trim();
         String age = ageInput.getText().toString().trim();
         String sex = sexDropdown.getSelectedItem().toString().trim();
 
         if (!name.equals("") && !age.equals("") && !sex.equals("")) {
-            Student student = new Student(name, Integer.parseInt(age), sex);
+            Student student = new Student(id, name, Integer.parseInt(age), sex, false);
             Intent intent = new Intent();
             intent.putExtra("Student", student);
             setResult(RESULT_OK, intent);

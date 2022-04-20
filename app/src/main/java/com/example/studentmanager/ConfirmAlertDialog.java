@@ -1,19 +1,15 @@
 package com.example.studentmanager;
 
-
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
-import android.widget.Toast;
-import androidx.appcompat.app.AlertDialog;
 
-import java.util.ArrayList;
+import androidx.appcompat.app.AlertDialog;
 
 public class ConfirmAlertDialog {
     private boolean isConfirm;
 
-    public void showAlertDialog(final Context context)  {
+    public void showAlertDialog(final Context context) {
         final Drawable positiveIcon = context.getResources().getDrawable(R.drawable.ic_baseline_check_circle_24);
         final Drawable negativeIcon = context.getResources().getDrawable(R.drawable.ic_baseline_cancel_24);
 

@@ -9,19 +9,21 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder> {
-    private final ArrayList<RecyclerItem> recyclerItems;
+    private final ArrayList<Student> students;
     private Context context;
     private final Button editBtn;
     private final Button deleteBtn;
     private final CheckBox checkBoxAll;
 
-    public CustomAdapter(ArrayList<RecyclerItem> recyclerItems, Context context, Button editBtn, Button deleteBtn, CheckBox checkBoxAll) {
-        this.recyclerItems = recyclerItems;
+    public CustomAdapter(ArrayList<Student> students, Context context, Button editBtn, Button deleteBtn, CheckBox checkBoxAll) {
+        this.students = students;
         this.context = context;
         this.editBtn = editBtn;
         this.deleteBtn = deleteBtn;
@@ -37,19 +39,19 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        RecyclerItem recyclerItem = recyclerItems.get(position);
-        holder.getNameTextView().setText(recyclerItem.getStudent().getName());
-        holder.getAgeTextView().setText(String.valueOf(recyclerItem.getStudent().getAge()));
-        holder.getSexTextView().setText(recyclerItem.getStudent().getSex());
-        holder.getCheckBox().setChecked(recyclerItem.getIsChecked());
-        eventHandler(holder, recyclerItem);
+        Student student = students.get(position);
+        holder.getNameTextView().setText(student.getName());
+        holder.getAgeTextView().setText(String.valueOf(student.getAge()));
+        holder.getSexTextView().setText(student.getSex());
+        holder.getCheckBox().setChecked(student.isChecked());
+        eventHandler(holder, student);
         checkBoxHandle();
         btnHandle();
     }
 
     @Override
     public int getItemCount() {
-        return recyclerItems.size();
+        return students.size();
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
@@ -82,20 +84,21 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
             return checkBox;
         }
     }
+
     /**
      * Hàm xử lý cho các button
      * Khi người dùng check 1 checkbox thì có thể sửa và xoá và thêm mới
      * Khi người dùng check nhiều hơn 1 checkbox thì chỉ có thể xoá và thêm mới
      * Khi người dùng không check checkbox nào thì chỉ có thể thêm mới
-     * */
+     */
     public void btnHandle() {
         int count = 0;
-        for (int i = 0; i < recyclerItems.size(); i++) {
-            if (recyclerItems.get(i).getIsChecked()) {
+        for (int i = 0; i < students.size(); i++) {
+            if (students.get(i).isChecked()) {
                 ++count;
             }
         }
-        if(count == 1) {
+        if (count == 1) {
             editBtn.setVisibility(View.VISIBLE);
             deleteBtn.setVisibility(View.VISIBLE);
         } else if (count > 1) {
@@ -108,30 +111,32 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
     }
 
     /**
-     * Hàm xử lý checkbox tất cả trên title */
+     * Hàm xử lý checkbox tất cả trên title
+     */
     private void checkBoxHandle() {
         checkBoxAll.setChecked(isCheckedAll());
     }
+
     /**
      * Hàm trả về true nếu tất cả các checkbox đã được check
      * Ngược lại trả về false
-     * */
-    private boolean isCheckedAll () {
-        for (int i = 0; i < recyclerItems.size(); i++) {
-            if (!recyclerItems.get(i).getIsChecked())
+     */
+    private boolean isCheckedAll() {
+        for (int i = 0; i < students.size(); i++) {
+            if (!students.get(i).isChecked())
                 return false;
         }
-        return recyclerItems.size() > 0;
+        return students.size() > 0;
     }
 
     /**
      * Hàm xử lý các sự kiện
-     * */
-    private void eventHandler(MyViewHolder holder, RecyclerItem recyclerItem) {
+     */
+    private void eventHandler(MyViewHolder holder, Student student) {
         holder.getCheckBox().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                recyclerItem.setChecked(b);
+                student.setChecked(b);
                 btnHandle();
                 checkBoxHandle();
             }
@@ -140,8 +145,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onClick(View view) {
-                for (int i = 0; i < recyclerItems.size(); i++) {
-                    recyclerItems.get(i).setChecked(checkBoxAll.isChecked());
+                for (int i = 0; i < students.size(); i++) {
+                    students.get(i).setChecked(checkBoxAll.isChecked());
                 }
                 btnHandle();
                 notifyDataSetChanged();
